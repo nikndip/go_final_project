@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 	"os"
+
+	"github.com/nikndip/go_final_project/pkg/api"
 )
 
 func Run() error {
@@ -12,6 +14,7 @@ func Run() error {
 	}
 
 	mux := http.NewServeMux()
+	api.Init(mux)
 	mux.Handle("/", http.FileServer(http.Dir("web")))
 
 	return http.ListenAndServe(":"+port, mux)
