@@ -47,6 +47,25 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 
 		years = 1
 
+	case "w":
+		if len(parts) != 2 {
+			return "", fmt.Errorf("ожидается правило w со списком дней недели")
+		}
+
+		return nextWeekDate(now, date, parts[1])
+
+	case "m":
+		if len(parts) < 2 || len(parts) > 3 {
+			return "", fmt.Errorf("ожидается правило m со списком дней и необязательным списком месяцев")
+		}
+
+		months := ""
+		if len(parts) == 3 {
+			months = parts[2]
+		}
+
+		return nextMonthDate(now, date, parts[1], months)
+
 	default:
 		return "", fmt.Errorf("неподдерживаемое правило: %s", parts[0])
 	}
