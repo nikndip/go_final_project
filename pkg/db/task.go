@@ -1,5 +1,7 @@
 package db
 
+import "time"
+
 type Task struct {
 	ID      string `json:"id"`
 	Date    string `json:"date"`
@@ -28,15 +30,29 @@ func AddTask(task *Task) (int64, error) {
 	return result.LastInsertId()
 }
 
-func Tasks(limit int) ([]*Task, error) {
+func Tasks(limit int, search string) ([]*Task, error) {
 	query := `
 		SELECT id, date, title, comment, repeat
 		FROM scheduler
-		ORDER BY date
-		LIMIT ?
 	`
 
-	rows, err := db.Query(query, limit)
+	var args []any
+
+	if search != "" {
+		if date, err := time.Parse("02.01.2006", search); err == nil {
+			query += " WHERE date = ?"
+			args = append(args, date.Format("20060102"))
+		} else {
+			query += " WHERE title LIKE ? OR comment LIKE ?"
+			pattern := "%" + search + "%"
+			args = append(args, pattern, pattern)
+		}
+	}
+
+	query += " ORDER BY date LIMIT ?"
+	args = append(args, limit)
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
