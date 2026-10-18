@@ -1,6 +1,9 @@
 package db
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Task struct {
 	ID      string `json:"id"`
@@ -81,4 +84,58 @@ func Tasks(limit int, search string) ([]*Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func GetTask(id string) (*Task, error) {
+	query := `
+		SELECT id, date, title, comment, repeat
+		FROM scheduler
+		WHERE id = ?
+	`
+
+	var task Task
+
+	err := db.QueryRow(query, id).Scan(
+		&task.ID,
+		&task.Date,
+		&task.Title,
+		&task.Comment,
+		&task.Repeat,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &task, nil
+}
+
+func UpdateTask(task *Task) error {
+	query := `
+		UPDATE scheduler
+		SET date = ?, title = ?, comment = ?, repeat = ?
+		WHERE id = ?
+	`
+
+	result, err := db.Exec(
+		query,
+		task.Date,
+		task.Title,
+		task.Comment,
+		task.Repeat,
+		task.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
