@@ -139,3 +139,46 @@ func UpdateTask(task *Task) error {
 
 	return nil
 }
+
+func DeleteTask(id string) error {
+	result, err := db.Exec(
+		"DELETE FROM scheduler WHERE id = ?",
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func UpdateDate(next, id string) error {
+	result, err := db.Exec(
+		"UPDATE scheduler SET date = ? WHERE id = ?",
+		next,
+		id,
+	)
+	if err != nil {
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
