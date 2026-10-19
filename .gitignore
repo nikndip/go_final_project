@@ -1,0 +1,5 @@
+/scheduler.db
+/scheduler.db-journal
+/scheduler.db-wal
+/scheduler.db-shm
+/data/
