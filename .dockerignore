@@ -1,0 +1,10 @@
+.git
+.github
+tests
+*.db
+*.db-*
+*.exe
+.env
+.env.*
+/data/
+README.md
